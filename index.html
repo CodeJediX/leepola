@@ -9,9 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    
     <style>
         /* --- 1. CSS VARIABLES & THEME --- */
         :root {
@@ -150,8 +147,6 @@
         .btn-accent:hover { background: #1ebc57; transform: translateY(-3px); color: white; }
         .btn-outline { border: 2px solid var(--border-color); background: transparent; color: var(--text-main); }
         .btn-outline:hover { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(197, 160, 89, 0.05); }
-        .btn-danger { background-color: rgba(211, 47, 47, 0.1); color: #D32F2F; padding: 8px 15px; font-size: 0.75rem; }
-        .btn-danger:hover { background-color: #D32F2F; color: white; transform: translateY(-2px); }
 
         /* FILTERS */
         .filter-container { background: var(--bg-white); padding: 35px; border-radius: var(--radius-lg); margin-bottom: 50px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; border: 1px solid var(--border-color); align-items: end; }
@@ -175,7 +170,6 @@
         .card-heart:hover { transform: scale(1.15); background: white; color: var(--accent-red); }
         .heart-active { color: var(--accent-red); animation: pop 0.4s ease; }
         .heart-inactive { color: #ccc; }
-        @keyframes pop { 50% { transform: scale(1.4); } }
         .item-content { padding: 25px; }
         .item-shop { font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
         .item-name { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; font-family: 'Playfair Display', serif; }
@@ -214,7 +208,7 @@
         .opt-btn { border: 1px solid var(--border-color); background: transparent; padding: 10px 20px; margin-right: 10px; margin-bottom: 10px; border-radius: 8px; transition: var(--transition); font-weight: 500; color: var(--text-main); }
         .opt-btn:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
         .opt-btn.selected { background: var(--accent-gold); color: #2D1B15; border-color: var(--accent-gold); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
-        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; color: var(--text-light); z-index: 10; transition: 0.3s; }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; color: var(--text-light); z-index: 10; transition: 0.3s; }
         .close-modal:hover { color: var(--accent-red); transform: rotate(90deg); }
 
         /* TOAST */
@@ -338,8 +332,6 @@
     </footer>
 
     <script>
-        const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-
         // --- CUSTOM CURSOR ---
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorOutline = document.querySelector('.cursor-outline');
@@ -381,7 +373,7 @@
                 toast_add: "Item added to cart!", toast_rem: "Removed from Wishlist", toast_wish: "Added to Wishlist",
                 footer_txt: "Connecting Sri Lanka's finest wood artisans with you.",
                 cat_table: "Table", cat_chair: "Chair", cat_bed: "Bed", cat_storage: "Storage",
-                cart_title: "Your Cart", cat_label: "CATEGORY", loc_label: "LOCATION", price_label: "PRICE RANGE"
+                cart_title: "Your Cart"
             },
             si: {
                 nav_home: "මුල් පිටුව", nav_shops: "වෙළඳසැල්", nav_coll: "එකතුව", nav_wish: "පැතුම්", nav_cart: "කූඩය",
@@ -395,7 +387,7 @@
                 toast_add: "කූඩයට එක් කරන ලදී!", toast_rem: "ඉවත් කරන ලදී", toast_wish: "එක් කරන ලදී",
                 footer_txt: "ශ්‍රී ලංකාවේ හොඳම දැව නිර්මාණ ඔබ වෙත.",
                 cat_table: "මේස", cat_chair: "පුටු", cat_bed: "ඇඳන්", cat_storage: "කබඩ්/රාක්ක",
-                cart_title: "ඔබගේ කූඩය", cat_label: "වර්ගය", loc_label: "ස්ථානය", price_label: "මිල පරාසය"
+                cart_title: "ඔබගේ කූඩය"
             },
             ta: {
                 nav_home: "முகப்பு", nav_shops: "கடைகள்", nav_coll: "தொகுப்பு", nav_wish: "விருப்பம்", nav_cart: "வண்டி",
@@ -409,12 +401,34 @@
                 toast_add: "சேர்க்கப்பட்டது!", toast_rem: "நீக்கப்பட்டது", toast_wish: "சேர்க்கப்பட்டது",
                 footer_txt: "இலங்கையின் சிறந்த மர கைவினைஞர்கள்.",
                 cat_table: "மேசை", cat_chair: "நாற்காலி", cat_bed: "கட்டில்", cat_storage: "சேமிப்பு",
-                cart_title: "உங்கள் வண்டி", cat_label: "வகை", loc_label: "இடம்", price_label: "விலை"
+                cart_title: "உங்கள் வண்டி"
             }
         };
 
         const flags = { 'en': '🇺🇸', 'si': '🇱🇰', 'ta': '🇱🇰' };
         const langNames = { 'en': 'English', 'si': 'සිංහල', 'ta': 'தமிழ்' };
+
+        // --- 1. DATASETS & STORAGE ---
+        const defaultShops = [
+            { id: 1, name: "Moratuwa WoodWorks", location: "Moratuwa, Colombo", tel: "94711111111", logo: "https://via.placeholder.com/150/5D4037/FFFFFF?text=MW" },
+            { id: 2, name: "Kandy Antique House", location: "Peradeniya, Kandy", tel: "94722222222", logo: "https://via.placeholder.com/150/8D6E63/FFFFFF?text=KAH" },
+            { id: 3, name: "Ruhunu Furniture", location: "Matara", tel: "94733333333", logo: "https://via.placeholder.com/150/D4AF37/000000?text=RF" },
+            { id: 4, name: "Jaffna Palmeira", location: "Jaffna", tel: "94744444444", logo: "https://via.placeholder.com/150/2E7D32/FFFFFF?text=JP" },
+            { id: 5, name: "Colombo Modern", location: "Bambalapitiya", tel: "94755555555", logo: "https://via.placeholder.com/150/424242/FFFFFF?text=CM" }
+        ];
+
+        const defaultProducts = [
+            { id: 101, shopId: 1, badge:"Best Seller", name: "Royal Teak Dining Table", price: 65000, category: "Table", image: "https://via.placeholder.com/600x400/3E2723/FFFFFF?text=Dining+Table", desc: "Handcrafted from solid teak wood, 6-seater capacity.", sizes: ["4x6 ft", "4x8 ft"], colors: ["Natural Teak", "Dark Walnut"] },
+            { id: 102, shopId: 1, badge:"", name: "Carved Wooden Chair", price: 12500, category: "Chair", image: "https://via.placeholder.com/600x400/5D4037/FFFFFF?text=Wooden+Chair", desc: "Intricate carvings with cushion seat.", sizes: ["Standard"], colors: ["Natural"] },
+            { id: 103, shopId: 2, badge:"Antique", name: "Vintage 1920 Wardrobe", price: 150000, category: "Storage", image: "https://via.placeholder.com/600x400/2D1B15/FFFFFF?text=Antique+Wardrobe", desc: "Restored antique masterpiece.", sizes: ["Large (6ft)"], colors: ["Dark Walnut"] },
+            { id: 104, shopId: 3, badge:"New", name: "Minimalist Study Desk", price: 18500, category: "Table", image: "https://via.placeholder.com/600x400/8D6E63/FFFFFF?text=Study+Desk", desc: "Compact design ideal for students.", sizes: ["4ft Width"], colors: ["Light Oak", "White Ash"] },
+            { id: 105, shopId: 3, badge:"", name: "Mahogany King Bed", price: 95000, category: "Bed", image: "https://via.placeholder.com/600x400/4E342E/FFFFFF?text=King+Bed", desc: "Luxury mahogany bed frame.", sizes: ["King", "Queen"], colors: ["Mahogany Red"] },
+            { id: 106, shopId: 1, badge:"", name: "Coffee Table", price: 14500, category: "Table", image: "https://via.placeholder.com/600x400/795548/FFFFFF?text=Coffee+Table", desc: "Low profile living room centerpiece.", sizes: ["Standard"], colors: ["Natural"] },
+            { id: 107, shopId: 4, badge:"Eco Friendly", name: "Cane Relax Chair", price: 8500, category: "Chair", image: "https://via.placeholder.com/600x400/C8E6C9/000000?text=Cane+Chair", desc: "Traditional Jaffna style cane weaving.", sizes: ["Standard"], colors: ["Natural Cane"] },
+            { id: 108, shopId: 4, badge:"", name: "Veranda Bench", price: 22000, category: "Chair", image: "https://via.placeholder.com/600x400/81C784/000000?text=Bench", desc: "Sturdy wooden bench with cane backrest.", sizes: ["3 Seater"], colors: ["Dark"] },
+            { id: 109, shopId: 5, badge:"Hot", name: "Modern Office Chair", price: 35000, category: "Chair", image: "https://via.placeholder.com/600x400/424242/FFFFFF?text=Office+Chair", desc: "Ergonomic swivel chair.", sizes: ["Adjustable"], colors: ["Black", "Grey"] },
+            { id: 110, shopId: 5, badge:"Modern", name: "Floating TV Unit", price: 45000, category: "Storage", image: "https://via.placeholder.com/600x400/616161/FFFFFF?text=TV+Unit", desc: "Wall mounted modern design.", sizes: ["5ft", "6ft"], colors: ["White Gloss", "Matte Black"] },
+        ];
 
         let shops = [];
         let products = [];
@@ -428,8 +442,8 @@
             isDarkMode: false,
             lang: 'en',
 
-            init: async function() {
-                await this.loadDatabase();
+            init: function() {
+                this.loadDatabase();
                 this.loadUserData();
                 this.initTheme();
                 this.initLanguage();
@@ -442,6 +456,7 @@
                     else this.renderHome(false); 
                 };
                 
+                // Close menu/drawer if clicked outside
                 window.onclick = function(event) {
                     const modal = document.getElementById('item-modal');
                     const langDrop = document.getElementById('lang-dropdown');
@@ -452,18 +467,20 @@
                 this.renderHome(false); 
             },
 
-            loadDatabase: async function() {
-                if(supabase) {
-                    let { data: s } = await supabase.from('shops').select('*');
-                    let { data: p } = await supabase.from('products').select('*');
-                    if(s) shops = s;
-                    if(p) products = p;
-                } else {
-                    shops = JSON.parse(localStorage.getItem('leepola_shops')) || [];
-                    products = JSON.parse(localStorage.getItem('leepola_products')) || [];
+            loadDatabase: function() {
+                try {
+                    const storedShops = localStorage.getItem('leepola_shops');
+                    const storedProducts = localStorage.getItem('leepola_products');
+                    if (storedShops) shops = JSON.parse(storedShops);
+                    else { shops = defaultShops; localStorage.setItem('leepola_shops', JSON.stringify(shops)); }
+                    if (storedProducts) products = JSON.parse(storedProducts);
+                    else { products = defaultProducts; localStorage.setItem('leepola_products', JSON.stringify(products)); }
+                } catch(e) {
+                    shops = defaultShops; products = defaultProducts;
                 }
             },
 
+            // --- THEME & LANGUAGE ---
             initTheme: function() {
                 const savedTheme = localStorage.getItem('leepola_theme');
                 if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) this.setTheme(true);
@@ -488,7 +505,7 @@
                 localStorage.setItem('leepola_lang', l);
                 this.updateLangUI();
                 const currentState = history.state || {page: 'home'};
-                this.handleRouting(currentState);
+                this.handleRouting(currentState); // Re-render current page
                 document.getElementById('lang-dropdown').classList.remove('active');
             },
             updateLangUI: function() {
@@ -496,6 +513,10 @@
                 document.getElementById('current-lang-text').innerText = langNames[this.lang];
             },
             t: function(key) { return dictionary[this.lang][key] || key; },
+            tCat: function(cat) {
+                const map = {'Table': dictionary[this.lang]['cat_table'], 'Chair': dictionary[this.lang]['cat_chair'], 'Bed': dictionary[this.lang]['cat_bed'], 'Storage': dictionary[this.lang]['cat_storage']};
+                return map[cat] || cat;
+            },
             updateStaticTranslations: function() {
                 document.getElementById('nav-home').innerText = this.t('nav_home');
                 document.getElementById('nav-shops').innerText = this.t('nav_shops');
@@ -504,26 +525,27 @@
                 document.getElementById('drawer-title').innerText = this.t('cart_title');
             },
 
+            // --- OBSERVER & ROUTING ---
             initScrollObserver: function() {
                 this.observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('active'); });
                 }, { threshold: 0.1 });
             },
             observeElements: function() {
-                setTimeout(() => {
-                    document.querySelectorAll('.reveal').forEach(el => this.observer.observe(el));
-                    document.querySelectorAll('a, button, .shop-card, .item-card, .lang-option, .icon-btn, .selected-lang, .theme-toggle, .close-drawer, .close-modal, .card-heart').forEach(el => {
-                        el.removeEventListener('mouseenter', () => {});
-                        el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-                        el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-                    });
-                }, 100);
+                setTimeout(() => document.querySelectorAll('.reveal').forEach(el => this.observer.observe(el)), 100);
+                // Update cursor listeners for new elements
+                document.querySelectorAll('a, button, .shop-card, .item-card, .lang-option, .icon-btn, .selected-lang, .theme-toggle, .close-drawer, .close-modal, .card-heart').forEach(el => {
+                    el.removeEventListener('mouseenter', () => {}); // cleanup old
+                    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+                });
             },
             handleRouting: function(state) {
                 this.updateStaticTranslations();
                 if (state.page === 'home') this.renderHome(false);
                 else if (state.page === 'shop') this.renderShopPage(state.id, false);
                 else if (state.page === 'wishlist') this.renderWishlist(false);
+                // Note: Cart is now a drawer, so we don't route to it.
             },
             scrollToSection: function(sectionId) {
                 const section = document.getElementById(sectionId);
@@ -545,6 +567,8 @@
                 window.scrollTo(0, 0);
                 this.observeElements();
             },
+
+            // --- DATA ---
             saveUserData: function() {
                 localStorage.setItem('leepola_cart', JSON.stringify(this.cart));
                 localStorage.setItem('leepola_wishlist', JSON.stringify(this.wishlist));
@@ -557,6 +581,7 @@
                 if(w) this.wishlist = JSON.parse(w);
             },
 
+            // --- RENDERERS ---
             renderHome: function(updateHistory = true) {
                 if(updateHistory) history.pushState({page: 'home'}, '', '#home');
                 this.setActiveNav('nav-home');
@@ -580,49 +605,13 @@
                     </div>`).join('')}</div></div>`;
 
                 let itemsHtml = `<div class="container" id="section-collection" style="margin-top:40px; margin-bottom:60px;"><div class="section-title">${this.t('sec_coll')}</div>
-                    
-                    <div class="filter-wrapper reveal">
-                        <div class="filter-search-row">
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                            <input class="search-input" type="text" id="search-input" placeholder="${this.t('search_ph')}" onkeyup="app.filterItems()">
-                        </div>
-
-                        <div class="filter-options-grid">
-                            <div class="filter-col">
-                                <label><i class="fa-solid fa-couch"></i> ${this.t('cat_label')}</label>
-                                <select class="filter-select" id="cat-select" onchange="app.filterItems()">
-                                    <option value="all">${this.t('cat_all')}</option>
-                                    <option value="Table">${this.t('cat_table')}</option>
-                                    <option value="Chair">${this.t('cat_chair')}</option>
-                                    <option value="Bed">${this.t('cat_bed')}</option>
-                                    <option value="Storage">${this.t('cat_storage')}</option>
-                                </select>
-                            </div>
-                            <div class="filter-col">
-                                <label><i class="fa-solid fa-location-dot"></i> ${this.t('loc_label')}</label>
-                                <select class="filter-select" id="loc-select" onchange="app.filterItems()">
-                                    <option value="all">${this.t('loc_all')}</option>
-                                    ${uniqueLocations.map(loc => `<option value="${loc}">${loc}</option>`).join('')}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="price-row">
-                            <label style="font-size:0.75rem; font-weight:700; color:var(--text-light); text-transform:uppercase;"><i class="fa-solid fa-tag"></i> ${this.t('price_label')}</label>
-                            <div class="price-inputs">
-                                <div class="price-field"><i class="fa-solid fa-minus"></i><input type="number" id="min-price-input" placeholder="${this.t('price_min')}" onkeyup="app.filterItems()"></div>
-                                <div style="color:var(--text-light)">—</div>
-                                <div class="price-field"><i class="fa-solid fa-plus"></i><input type="number" id="max-price-input" placeholder="${this.t('price_max')}" onkeyup="app.filterItems()"></div>
-                            </div>
-                            <div class="price-chips">
-                                <span class="p-chip" onclick="app.setPrice('min', 5000, 'main')">Min 5k</span>
-                                <span class="p-chip" onclick="app.setPrice('max', 25000, 'main')">Max 25k</span>
-                                <span class="p-chip" onclick="app.setPrice('max', 50000, 'main')">Max 50k</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="items-grid" class="grid-container">${this.generateProductCards(products)}</div></div>`;
+                    <div class="filter-container reveal">
+                        <div class="filter-group"><label class="filter-label">${this.t('search_ph')}</label><input class="filter-input" type="text" id="search-input" placeholder="${this.t('search_ph')}" onkeyup="app.filterItems()"></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('cat_all')}</label><select class="filter-input" id="cat-select" onchange="app.filterItems()"><option value="all">${this.t('cat_all')}</option><option value="Table">${this.t('cat_table')}</option><option value="Chair">${this.t('cat_chair')}</option><option value="Bed">${this.t('cat_bed')}</option><option value="Storage">${this.t('cat_storage')}</option></select></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('loc_all')}</label><select class="filter-input" id="loc-select" onchange="app.filterItems()"><option value="all">${this.t('loc_all')}</option>${uniqueLocations.map(loc => `<option value="${loc}">${loc}</option>`).join('')}</select></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('price_min')}</label><input class="filter-input" type="number" id="min-price-input" placeholder="Custom" onkeyup="app.filterItems()"></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('price_max')}</label><input class="filter-input" type="number" id="max-price-input" placeholder="Custom" onkeyup="app.filterItems()"></div>
+                    </div><div id="items-grid" class="grid-container">${this.generateProductCards(products)}</div></div>`;
 
                 this.updateView(slideHtml + shopsHtml + itemsHtml);
                 this.startSlideshow();
@@ -644,18 +633,14 @@
                             <div style="margin-top:20px; display:flex; gap:10px;"><a href="javascript:void(0)" onclick="app.openWhatsapp(${shop.id})" class="btn btn-accent"><i class="fa-brands fa-whatsapp"></i> ${this.t('chat_btn')}</a><a href="${mapLink}" target="_blank" class="btn btn-outline"><i class="fa-solid fa-map-location-dot"></i> Map</a></div>
                         </div>
                     </div><div class="section-title" style="margin-top:50px;">${this.t('sec_coll')}</div>
-                    
-                    <div class="filter-wrapper reveal" style="padding:20px;">
-                        <input class="filter-input" type="text" id="shop-search" placeholder="${this.t('search_ph')}" onkeyup="app.filterShopItems(${shopId})">
-                    </div>
-
+                    <div class="filter-container reveal"><input class="filter-input" type="text" id="shop-search" placeholder="${this.t('search_ph')}" onkeyup="app.filterShopItems(${shopId})"></div>
                     <div id="shop-items-grid" class="grid-container">${this.generateProductCards(shopProducts)}</div></div>`;
                 this.updateView(html);
             },
 
             renderWishlist: function(updateHistory = true) {
                 if(updateHistory) history.pushState({page: 'wishlist'}, '', '#wishlist');
-                this.setActiveNav(null); 
+                this.setActiveNav(null); // Wishlist isn't nav item anymore
                 this.stopSlideshow();
                 const wishItems = products.filter(p => this.wishlist.includes(p.id));
                 let html = '';
