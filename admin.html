@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | LeePola</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <script src="code-03-config.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     
     <style>
         :root {
@@ -77,18 +79,22 @@
         .shop-banner { background: linear-gradient(135deg, var(--primary), #3e2723); color: var(--accent); padding: 30px; border-radius: 12px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(45, 27, 21, 0.2); }
         .banner-info h1 { margin: 0; font-family: 'Playfair Display', serif; }
         .banner-info p { color: #ccc; margin-top: 5px; }
+
+        /* Loader for Async ops */
+        .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; display:none; justify-content:center; align-items:center; font-weight:bold; color: var(--primary); }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loader">Syncing with Database...</div>
 
     <div class="sidebar">
-        <a href="code-01-index.html" class="brand">Lee<span>Pola</span> Admin</a>
+        <a href="index.html" class="brand">Lee<span>Pola</span> Admin</a>
         
         <div id="menu-shops" class="menu-item active" onclick="app.showShopList()">🏪 Manage Shops</div>
         <div id="menu-current" class="menu-item" style="display:none;" onclick="app.showShopDashboard()">👉 Current Shop</div>
 
-        <a href="code-01-index.html" class="menu-item" style="margin-top: 20px;">← Back to Website</a>
-        <div class="menu-item danger" onclick="app.resetData()">⚠ Reset All Data</div>
+        <a href="index.html" class="menu-item" style="margin-top: 20px;">← Back to Website</a>
+        <div class="menu-item danger" onclick="alert('To reset data, please use the Supabase Dashboard directly.')">⚠ Database Connected</div>
     </div>
 
     <div class="main-content">
@@ -230,41 +236,50 @@
     </div>
 
     <script>
+        // Initialize Supabase Client
+        const { createClient } = supabase;
+        const _supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
         const app = {
             shops: [],
             products: [],
             currentShopId: null,
             editingProductId: null,
 
-            init: function() {
-                this.loadData();
+            init: async function() {
+                await this.loadData();
                 this.renderShopTable();
             },
 
-            loadData: function() {
-                try {
-                    const storedShops = localStorage.getItem('leepola_shops');
-                    const storedProducts = localStorage.getItem('leepola_products');
-                    
-                    if(storedShops) this.shops = JSON.parse(storedShops);
-                    else this.shops = [];
-                    
-                    if(storedProducts) this.products = JSON.parse(storedProducts);
-                    else this.products = [];
-
-                } catch(e) { console.error("Data load error", e); }
+            setLoading: function(show) {
+                document.getElementById('loader').style.display = show ? 'flex' : 'none';
             },
 
-            saveData: function() {
+            loadData: async function() {
+                this.setLoading(true);
                 try {
-                    localStorage.setItem('leepola_shops', JSON.stringify(this.shops));
-                    localStorage.setItem('leepola_products', JSON.stringify(this.products));
-                } catch (e) {
-                    if (e.name === 'QuotaExceededError') {
-                         alert("Storage Limit Exceeded! The image you are trying to upload is too large. Please use an Image URL instead or a smaller file.");
-                    } else {
-                        alert("Error saving data.");
-                    }
+                    // Fetch Shops
+                    let { data: shopsData, error: shopsError } = await _supabase.from('shops').select('*').order('id', { ascending: true });
+                    if(shopsError) throw shopsError;
+                    this.shops = shopsData || [];
+
+                    // Fetch Products
+                    let { data: productsData, error: productsError } = await _supabase.from('products').select('*').order('id', { ascending: false });
+                    if(productsError) throw productsError;
+                    
+                    // Transform snake_case from DB to match app logic (if needed)
+                    this.products = productsData.map(p => ({
+                        ...p,
+                        shopId: p.shop_id,
+                        woodType: p.wood_type
+                        // sizes and colors are auto-mapped as arrays
+                    })) || [];
+
+                } catch(e) { 
+                    console.error("Data load error", e); 
+                    alert("Error connecting to database: " + e.message);
+                } finally {
+                    this.setLoading(false);
                 }
             },
 
@@ -338,12 +353,6 @@
             previewImage: function(input, previewId) {
                 const file = input.files[0];
                 if(file) {
-                    // Check file size (approx 2MB limit)
-                    if(file.size > 2000000) {
-                        alert("File is too big! Please select an image under 2MB.");
-                        input.value = "";
-                        return;
-                    }
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const preview = document.getElementById(previewId);
@@ -374,7 +383,7 @@
                 return urlData; 
             },
 
-            addShop: function() {
+            addShop: async function() {
                 const name = document.getElementById('s-name').value;
                 const loc = document.getElementById('s-loc').value;
                 const tel = document.getElementById('s-tel').value;
@@ -382,29 +391,43 @@
 
                 if(!name || !loc) return alert("Name and Location are required!");
 
-                // FIX: Added '|| 0' to handle empty arrays properly
-                const newId = this.shops.length > 0 ? (Math.max(...this.shops.map(s => s.id)) + 1) : 1;
-                
-                this.shops.push({ id: newId, name, location: loc, tel, logo });
-                this.saveData();
-                this.renderShopTable();
-                
-                document.getElementById('s-name').value = '';
-                document.getElementById('s-loc').value = '';
-                document.getElementById('s-tel').value = '';
-                document.getElementById('s-logo-url').value = '';
-                document.getElementById('s-logo-final').value = '';
-                document.getElementById('s-logo-preview').style.display = 'none';
-                
-                alert("Shop Created Successfully!");
+                this.setLoading(true);
+                const { data, error } = await _supabase
+                    .from('shops')
+                    .insert([{ name: name, location: loc, tel: tel, logo: logo }])
+                    .select();
+
+                this.setLoading(false);
+
+                if(error) {
+                    alert("Error adding shop: " + error.message);
+                } else {
+                    alert("Shop Created Successfully!");
+                    // Refresh data
+                    await this.loadData();
+                    this.renderShopTable();
+                    
+                    // Clear inputs
+                    document.getElementById('s-name').value = '';
+                    document.getElementById('s-loc').value = '';
+                    document.getElementById('s-tel').value = '';
+                    document.getElementById('s-logo-url').value = '';
+                    document.getElementById('s-logo-final').value = '';
+                    document.getElementById('s-logo-preview').style.display = 'none';
+                }
             },
 
-            deleteShop: function(id) {
+            deleteShop: async function(id) {
                 if(confirm("⚠ Delete this shop? All its products will be deleted too!")) {
-                    this.shops = this.shops.filter(s => s.id !== id);
-                    this.products = this.products.filter(p => p.shopId !== id);
-                    this.saveData();
-                    this.renderShopTable();
+                    this.setLoading(true);
+                    const { error } = await _supabase.from('shops').delete().eq('id', id);
+                    if(error) {
+                        alert("Error deleting: " + error.message);
+                    } else {
+                        await this.loadData();
+                        this.renderShopTable();
+                    }
+                    this.setLoading(false);
                 }
             },
 
@@ -431,7 +454,7 @@
                 `).join('');
             },
 
-            saveProduct: function() {
+            saveProduct: async function() {
                 if(!this.currentShopId) return alert("Error: No shop selected.");
 
                 const name = document.getElementById('p-name').value;
@@ -452,45 +475,58 @@
                 
                 if(!name || !price) return alert("Product Name and Price are required!");
 
-                if (this.editingProductId) {
-                    const productIndex = this.products.findIndex(p => p.id === this.editingProductId);
-                    if (productIndex > -1) {
-                        if (!img) img = this.products[productIndex].image;
+                this.setLoading(true);
 
-                        this.products[productIndex] = {
-                            ...this.products[productIndex],
-                            name, 
-                            price: parseFloat(price), 
-                            category: cat, badge, desc, image: img,
-                            sizes: sizes, colors: colors, woodType: woodType
-                        };
-                        alert("Product Updated Successfully!");
-                    }
+                if (this.editingProductId) {
+                    // Update Existing
+                    const productIndex = this.products.findIndex(p => p.id === this.editingProductId);
+                    if(!img && productIndex > -1) img = this.products[productIndex].image; // Keep old image if no new one
+
+                    const { error } = await _supabase
+                        .from('products')
+                        .update({
+                            name: name,
+                            price: parseFloat(price),
+                            category: cat,
+                            badge: badge,
+                            description: desc,
+                            image: img,
+                            sizes: sizes,
+                            colors: colors,
+                            wood_type: woodType
+                        })
+                        .eq('id', this.editingProductId);
+
+                    if(error) alert("Error updating: " + error.message);
+                    else alert("Product Updated Successfully!");
+
                 } else {
+                    // Insert New
                     if (!img) img = 'https://via.placeholder.com/600x400';
                     
-                    // FIX: Added '|| 100' to handle empty arrays properly
-                    const newId = this.products.length > 0 ? (Math.max(...this.products.map(p => p.id)) + 1) : 101;
+                    const { error } = await _supabase
+                        .from('products')
+                        .insert([{
+                            shop_id: this.currentShopId,
+                            name: name,
+                            price: parseFloat(price),
+                            category: cat,
+                            image: img,
+                            badge: badge,
+                            description: desc || "No description provided.",
+                            sizes: sizes,
+                            colors: colors,
+                            wood_type: woodType
+                        }]);
                     
-                    this.products.push({
-                        id: newId,
-                        shopId: this.currentShopId,
-                        name,
-                        price: parseFloat(price),
-                        category: cat,
-                        image: img,
-                        badge,
-                        desc: desc || "No description provided.",
-                        sizes: sizes,
-                        colors: colors,
-                        woodType: woodType
-                    });
-                    alert("Product Added to Inventory!");
+                    if(error) alert("Error adding product: " + error.message);
+                    else alert("Product Added to Inventory!");
                 }
 
-                this.saveData();
+                await this.loadData();
                 this.renderProductTable();
                 this.cancelEdit(); 
+                this.setLoading(false);
             },
 
             editProduct: function(id) {
@@ -501,7 +537,7 @@
                 document.getElementById('p-price').value = p.price;
                 document.getElementById('p-cat').value = p.category;
                 document.getElementById('p-badge').value = p.badge;
-                document.getElementById('p-desc').value = p.desc;
+                document.getElementById('p-desc').value = p.description; // DB uses description
                 document.getElementById('p-wood').value = p.woodType || '';
                 
                 document.getElementById('p-colors').value = p.colors ? p.colors.join(', ') : '';
@@ -548,12 +584,17 @@
                 document.getElementById('cancel-edit-btn').style.display = 'none';
             },
 
-            deleteProduct: function(id) {
+            deleteProduct: async function(id) {
                 if(confirm("Delete this product?")) {
-                    this.products = this.products.filter(p => p.id !== id);
-                    this.saveData();
-                    this.renderProductTable();
-                    if(this.editingProductId === id) this.cancelEdit(); 
+                    this.setLoading(true);
+                    const { error } = await _supabase.from('products').delete().eq('id', id);
+                    if(error) alert("Error deleting: " + error.message);
+                    else {
+                        await this.loadData();
+                        this.renderProductTable();
+                        if(this.editingProductId === id) this.cancelEdit(); 
+                    }
+                    this.setLoading(false);
                 }
             },
 
@@ -587,13 +628,6 @@
                         </td>
                     </tr>
                 `).join('');
-            },
-
-            resetData: function() {
-                if(confirm("DANGER: This will wipe all changes and restore default data. Continue?")) {
-                    localStorage.clear();
-                    location.href = "code-01-index.html"; 
-                }
             }
         };
 

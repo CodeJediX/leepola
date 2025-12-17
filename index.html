@@ -9,7 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="code-03-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     
     <style>
         /* --- 1. CSS VARIABLES & THEME --- */
@@ -320,7 +321,7 @@
             <span class="footer-logo">LeePola</span>
             <p style="margin-bottom:30px; font-size:0.9rem;" id="footer-text">Connecting Sri Lanka's finest wood artisans with you.</p>
             
-            <a href="code-02-admin.html" class="btn-outline" style="font-size:0.7rem; padding: 6px 15px; border-radius: 30px; margin-bottom: 20px; display:inline-block; border-color: #333; color: #666;">
+            <a href="admin.html" class="btn-outline" style="font-size:0.7rem; padding: 6px 15px; border-radius: 30px; margin-bottom: 20px; display:inline-block; border-color: #333; color: #666;">
                 <i class="fa-solid fa-gear"></i> Admin Panel
             </a>
 
@@ -410,30 +411,12 @@
         const flags = { 'en': '🇺🇸', 'si': '🇱🇰', 'ta': '🇱🇰' };
         const langNames = { 'en': 'English', 'si': 'සිංහල', 'ta': 'தமிழ்' };
 
-        // --- 1. DATASETS & STORAGE ---
-        const defaultShops = [
-            { id: 1, name: "Moratuwa WoodWorks", location: "Moratuwa, Colombo", tel: "94711111111", logo: "https://via.placeholder.com/150/5D4037/FFFFFF?text=MW" },
-            { id: 2, name: "Kandy Antique House", location: "Peradeniya, Kandy", tel: "94722222222", logo: "https://via.placeholder.com/150/8D6E63/FFFFFF?text=KAH" },
-            { id: 3, name: "Ruhunu Furniture", location: "Matara", tel: "94733333333", logo: "https://via.placeholder.com/150/D4AF37/000000?text=RF" },
-            { id: 4, name: "Jaffna Palmeira", location: "Jaffna", tel: "94744444444", logo: "https://via.placeholder.com/150/2E7D32/FFFFFF?text=JP" },
-            { id: 5, name: "Colombo Modern", location: "Bambalapitiya", tel: "94755555555", logo: "https://via.placeholder.com/150/424242/FFFFFF?text=CM" }
-        ];
-
-        const defaultProducts = [
-            { id: 101, shopId: 1, badge:"Best Seller", name: "Royal Teak Dining Table", price: 65000, category: "Table", image: "https://via.placeholder.com/600x400/3E2723/FFFFFF?text=Dining+Table", desc: "Handcrafted from solid teak wood, 6-seater capacity.", sizes: ["4x6 ft", "4x8 ft"], colors: ["Natural Teak", "Dark Walnut"] },
-            { id: 102, shopId: 1, badge:"", name: "Carved Wooden Chair", price: 12500, category: "Chair", image: "https://via.placeholder.com/600x400/5D4037/FFFFFF?text=Wooden+Chair", desc: "Intricate carvings with cushion seat.", sizes: ["Standard"], colors: ["Natural"] },
-            { id: 103, shopId: 2, badge:"Antique", name: "Vintage 1920 Wardrobe", price: 150000, category: "Storage", image: "https://via.placeholder.com/600x400/2D1B15/FFFFFF?text=Antique+Wardrobe", desc: "Restored antique masterpiece.", sizes: ["Large (6ft)"], colors: ["Dark Walnut"] },
-            { id: 104, shopId: 3, badge:"New", name: "Minimalist Study Desk", price: 18500, category: "Table", image: "https://via.placeholder.com/600x400/8D6E63/FFFFFF?text=Study+Desk", desc: "Compact design ideal for students.", sizes: ["4ft Width"], colors: ["Light Oak", "White Ash"] },
-            { id: 105, shopId: 3, badge:"", name: "Mahogany King Bed", price: 95000, category: "Bed", image: "https://via.placeholder.com/600x400/4E342E/FFFFFF?text=King+Bed", desc: "Luxury mahogany bed frame.", sizes: ["King", "Queen"], colors: ["Mahogany Red"] },
-            { id: 106, shopId: 1, badge:"", name: "Coffee Table", price: 14500, category: "Table", image: "https://via.placeholder.com/600x400/795548/FFFFFF?text=Coffee+Table", desc: "Low profile living room centerpiece.", sizes: ["Standard"], colors: ["Natural"] },
-            { id: 107, shopId: 4, badge:"Eco Friendly", name: "Cane Relax Chair", price: 8500, category: "Chair", image: "https://via.placeholder.com/600x400/C8E6C9/000000?text=Cane+Chair", desc: "Traditional Jaffna style cane weaving.", sizes: ["Standard"], colors: ["Natural Cane"] },
-            { id: 108, shopId: 4, badge:"", name: "Veranda Bench", price: 22000, category: "Chair", image: "https://via.placeholder.com/600x400/81C784/000000?text=Bench", desc: "Sturdy wooden bench with cane backrest.", sizes: ["3 Seater"], colors: ["Dark"] },
-            { id: 109, shopId: 5, badge:"Hot", name: "Modern Office Chair", price: 35000, category: "Chair", image: "https://via.placeholder.com/600x400/424242/FFFFFF?text=Office+Chair", desc: "Ergonomic swivel chair.", sizes: ["Adjustable"], colors: ["Black", "Grey"] },
-            { id: 110, shopId: 5, badge:"Modern", name: "Floating TV Unit", price: 45000, category: "Storage", image: "https://via.placeholder.com/600x400/616161/FFFFFF?text=TV+Unit", desc: "Wall mounted modern design.", sizes: ["5ft", "6ft"], colors: ["White Gloss", "Matte Black"] },
-        ];
-
         let shops = [];
         let products = [];
+
+        // --- SUPABASE CLIENT ---
+        const { createClient } = supabase;
+        const _supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
         // --- APP LOGIC ---
         const app = {
@@ -444,13 +427,14 @@
             isDarkMode: false,
             lang: 'en',
 
-            init: function() {
-                this.loadDatabase();
-                this.loadUserData();
+            init: async function() {
+                this.loadUserData(); // Load cart/wishlist from local storage
                 this.initTheme();
                 this.initLanguage();
                 this.updateCounts();
                 this.initScrollObserver();
+                
+                await this.loadDatabase(); // Load Shops/Products from Supabase
                 
                 history.replaceState({page: 'home'}, '', '#home');
                 window.onpopstate = (event) => {
@@ -469,16 +453,32 @@
                 this.renderHome(false); 
             },
 
-            loadDatabase: function() {
+            loadDatabase: async function() {
                 try {
-                    const storedShops = localStorage.getItem('leepola_shops');
-                    const storedProducts = localStorage.getItem('leepola_products');
-                    if (storedShops) shops = JSON.parse(storedShops);
-                    else { shops = defaultShops; localStorage.setItem('leepola_shops', JSON.stringify(shops)); }
-                    if (storedProducts) products = JSON.parse(storedProducts);
-                    else { products = defaultProducts; localStorage.setItem('leepola_products', JSON.stringify(products)); }
+                    // Fetch Shops
+                    let { data: shopsData, error: shopsError } = await _supabase.from('shops').select('*').order('id', { ascending: true });
+                    if (shopsData) shops = shopsData;
+                    
+                    // Fetch Products
+                    let { data: productsData, error: productsError } = await _supabase.from('products').select('*').order('id', { ascending: false });
+                    if (productsData) {
+                        // Map snake_case DB columns to camelCase expected by frontend
+                        products = productsData.map(p => ({
+                            id: p.id,
+                            shopId: p.shop_id,
+                            name: p.name,
+                            price: p.price,
+                            category: p.category,
+                            image: p.image,
+                            badge: p.badge,
+                            desc: p.description,
+                            woodType: p.wood_type,
+                            sizes: p.sizes,
+                            colors: p.colors
+                        }));
+                    }
                 } catch(e) {
-                    shops = defaultShops; products = defaultProducts;
+                    console.error("Error fetching data:", e);
                 }
             },
 
@@ -550,16 +550,13 @@
             },
             scrollToSection: function(sectionId) {
                 const section = document.getElementById(sectionId);
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    // FIX: If section doesn't exist (e.g. we are on Wishlist page), go home first
+                if (section) section.scrollIntoView({ behavior: 'smooth' });
+                else {
                     this.renderHome();
-                    // Wait for DOM update
                     setTimeout(() => {
                         const newSection = document.getElementById(sectionId);
                         if(newSection) newSection.scrollIntoView({ behavior: 'smooth' });
-                    }, 300);
+                    }, 100);
                 }
             },
             updateView: function(html) {
@@ -626,6 +623,9 @@
                 this.setActiveNav('nav-home'); 
                 const shop = shops.find(s => s.id === shopId);
                 const shopProducts = products.filter(p => p.shopId === shopId);
+                
+                if(!shop) { this.renderHome(); return; }
+
                 const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(shop.location);
                 this.stopSlideshow();
 
@@ -644,7 +644,7 @@
 
             renderWishlist: function(updateHistory = true) {
                 if(updateHistory) history.pushState({page: 'wishlist'}, '', '#wishlist');
-                this.setActiveNav(null); // Wishlist isn't nav item anymore
+                this.setActiveNav(null); 
                 this.stopSlideshow();
                 const wishItems = products.filter(p => this.wishlist.includes(p.id));
                 let html = '';
@@ -653,7 +653,7 @@
                 this.updateView(html);
             },
 
-            // --- NEW: CART DRAWER ---
+            // --- CART DRAWER ---
             toggleCart: function() {
                 const drawer = document.getElementById('cart-drawer');
                 const overlay = document.querySelector('.cart-drawer-overlay');
@@ -752,13 +752,8 @@
             refreshCurrentGrid: function() {
                 if(document.getElementById('search-input')) this.filterItems();
                 if(document.getElementById('shop-search')) {
-                    // FIX: Safe navigation to find current shop context
-                    const shopNameEl = document.getElementById('dash-shop-name'); // Not on index page, so we use other method
-                    const visibleShopCard = document.querySelector('.shop-banner h1');
-                    
-                    if(visibleShopCard) {
-                         // We are on shop page, logic is handled by filterShopItems triggers
-                    }
+                    const shopId = products.find(p => document.querySelector('.section-title').innerText.includes(shops.find(s=>s.id === p.shopId).name))?.shopId;
+                    if(shopId) this.filterShopItems(shopId);
                 }
             },
             addToCart: function(itemId) {
@@ -782,11 +777,10 @@
             },
             openItemModal: function(itemId) {
                 const p = products.find(i => i.id === itemId);
-                const shop = shops.find(s => s.id === p.shopId);
-                const modal = document.getElementById('item-modal');
                 const sizes = p.sizes || ["Standard"];
                 const colors = p.colors || ["Default"];
                 let selSize = sizes[0]; let selColor = colors[0];
+                const modal = document.getElementById('item-modal');
                 modal.querySelector('.modal-body').innerHTML = `
                     <img src="${p.image}" class="modal-img">
                     <div class="modal-details"><h2 style="font-size:2rem; margin-bottom:5px; color:var(--text-heading);">${p.name}</h2><h3 style="color:var(--primary-wood); font-size:1.8rem; margin-bottom:20px;">Rs. ${p.price.toLocaleString()}</h3>
@@ -825,11 +819,7 @@
                 if(el) { el.value = val; (context === 'shop' && shopId) ? this.filterShopItems(shopId) : this.filterItems(); }
             },
             filterItems: function() {
-                // FIX: Check if input exists (in case user filters while not on home page)
-                const inputEl = document.getElementById('search-input');
-                if(!inputEl) return; 
-
-                const txt = inputEl.value.toLowerCase();
+                const txt = document.getElementById('search-input').value.toLowerCase();
                 const cat = document.getElementById('cat-select').value;
                 const loc = document.getElementById('loc-select').value;
                 const min = document.getElementById('min-price-input').value; 
@@ -849,9 +839,7 @@
             },
             setActiveNav: function(id) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                if(id) {
-                    const el = document.getElementById(id); if(el) el.classList.add('active');
-                }
+                const el = document.getElementById(id); if(el) el.classList.add('active');
             },
             startSlideshow: function() {
                 this.stopSlideshow();
