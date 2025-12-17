@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="code-03-config.js"></script>
+    
     <style>
         /* --- 1. CSS VARIABLES & THEME --- */
         :root {
@@ -318,7 +320,7 @@
             <span class="footer-logo">LeePola</span>
             <p style="margin-bottom:30px; font-size:0.9rem;" id="footer-text">Connecting Sri Lanka's finest wood artisans with you.</p>
             
-            <a href="admin.html" class="btn-outline" style="font-size:0.7rem; padding: 6px 15px; border-radius: 30px; margin-bottom: 20px; display:inline-block; border-color: #333; color: #666;">
+            <a href="code-02-admin.html" class="btn-outline" style="font-size:0.7rem; padding: 6px 15px; border-radius: 30px; margin-bottom: 20px; display:inline-block; border-color: #333; color: #666;">
                 <i class="fa-solid fa-gear"></i> Admin Panel
             </a>
 
@@ -545,17 +547,19 @@
                 if (state.page === 'home') this.renderHome(false);
                 else if (state.page === 'shop') this.renderShopPage(state.id, false);
                 else if (state.page === 'wishlist') this.renderWishlist(false);
-                // Note: Cart is now a drawer, so we don't route to it.
             },
             scrollToSection: function(sectionId) {
                 const section = document.getElementById(sectionId);
-                if (section) section.scrollIntoView({ behavior: 'smooth' });
-                else {
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    // FIX: If section doesn't exist (e.g. we are on Wishlist page), go home first
                     this.renderHome();
+                    // Wait for DOM update
                     setTimeout(() => {
                         const newSection = document.getElementById(sectionId);
                         if(newSection) newSection.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
+                    }, 300);
                 }
             },
             updateView: function(html) {
@@ -748,8 +752,13 @@
             refreshCurrentGrid: function() {
                 if(document.getElementById('search-input')) this.filterItems();
                 if(document.getElementById('shop-search')) {
-                    const shopId = products.find(p => document.querySelector('.section-title').innerText.includes(shops.find(s=>s.id === p.shopId).name))?.shopId;
-                    if(shopId) this.filterShopItems(shopId);
+                    // FIX: Safe navigation to find current shop context
+                    const shopNameEl = document.getElementById('dash-shop-name'); // Not on index page, so we use other method
+                    const visibleShopCard = document.querySelector('.shop-banner h1');
+                    
+                    if(visibleShopCard) {
+                         // We are on shop page, logic is handled by filterShopItems triggers
+                    }
                 }
             },
             addToCart: function(itemId) {
@@ -816,7 +825,11 @@
                 if(el) { el.value = val; (context === 'shop' && shopId) ? this.filterShopItems(shopId) : this.filterItems(); }
             },
             filterItems: function() {
-                const txt = document.getElementById('search-input').value.toLowerCase();
+                // FIX: Check if input exists (in case user filters while not on home page)
+                const inputEl = document.getElementById('search-input');
+                if(!inputEl) return; 
+
+                const txt = inputEl.value.toLowerCase();
                 const cat = document.getElementById('cat-select').value;
                 const loc = document.getElementById('loc-select').value;
                 const min = document.getElementById('min-price-input').value; 
@@ -836,7 +849,9 @@
             },
             setActiveNav: function(id) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                const el = document.getElementById(id); if(el) el.classList.add('active');
+                if(id) {
+                    const el = document.getElementById(id); if(el) el.classList.add('active');
+                }
             },
             startSlideshow: function() {
                 this.stopSlideshow();

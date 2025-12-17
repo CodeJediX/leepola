@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | LeePola</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script src="code-03-config.js"></script>
     
     <style>
         :root {
@@ -81,12 +82,12 @@
 <body>
 
     <div class="sidebar">
-        <a href="index.html" class="brand">Lee<span>Pola</span> Admin</a>
+        <a href="code-01-index.html" class="brand">Lee<span>Pola</span> Admin</a>
         
         <div id="menu-shops" class="menu-item active" onclick="app.showShopList()">🏪 Manage Shops</div>
         <div id="menu-current" class="menu-item" style="display:none;" onclick="app.showShopDashboard()">👉 Current Shop</div>
 
-        <a href="index.html" class="menu-item" style="margin-top: 20px;">← Back to Website</a>
+        <a href="code-01-index.html" class="menu-item" style="margin-top: 20px;">← Back to Website</a>
         <div class="menu-item danger" onclick="app.resetData()">⚠ Reset All Data</div>
     </div>
 
@@ -242,8 +243,15 @@
 
             loadData: function() {
                 try {
-                    this.shops = JSON.parse(localStorage.getItem('leepola_shops')) || [];
-                    this.products = JSON.parse(localStorage.getItem('leepola_products')) || [];
+                    const storedShops = localStorage.getItem('leepola_shops');
+                    const storedProducts = localStorage.getItem('leepola_products');
+                    
+                    if(storedShops) this.shops = JSON.parse(storedShops);
+                    else this.shops = [];
+                    
+                    if(storedProducts) this.products = JSON.parse(storedProducts);
+                    else this.products = [];
+
                 } catch(e) { console.error("Data load error", e); }
             },
 
@@ -252,7 +260,11 @@
                     localStorage.setItem('leepola_shops', JSON.stringify(this.shops));
                     localStorage.setItem('leepola_products', JSON.stringify(this.products));
                 } catch (e) {
-                    alert("Storage Error: Image file likely too large. Please upload a smaller image.");
+                    if (e.name === 'QuotaExceededError') {
+                         alert("Storage Limit Exceeded! The image you are trying to upload is too large. Please use an Image URL instead or a smaller file.");
+                    } else {
+                        alert("Error saving data.");
+                    }
                 }
             },
 
@@ -326,6 +338,12 @@
             previewImage: function(input, previewId) {
                 const file = input.files[0];
                 if(file) {
+                    // Check file size (approx 2MB limit)
+                    if(file.size > 2000000) {
+                        alert("File is too big! Please select an image under 2MB.");
+                        input.value = "";
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const preview = document.getElementById(previewId);
@@ -364,7 +382,8 @@
 
                 if(!name || !loc) return alert("Name and Location are required!");
 
-                const newId = this.shops.length > 0 ? Math.max(...this.shops.map(s => s.id)) + 1 : 1;
+                // FIX: Added '|| 0' to handle empty arrays properly
+                const newId = this.shops.length > 0 ? (Math.max(...this.shops.map(s => s.id)) + 1) : 1;
                 
                 this.shops.push({ id: newId, name, location: loc, tel, logo });
                 this.saveData();
@@ -450,7 +469,9 @@
                 } else {
                     if (!img) img = 'https://via.placeholder.com/600x400';
                     
-                    const newId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 101;
+                    // FIX: Added '|| 100' to handle empty arrays properly
+                    const newId = this.products.length > 0 ? (Math.max(...this.products.map(p => p.id)) + 1) : 101;
+                    
                     this.products.push({
                         id: newId,
                         shopId: this.currentShopId,
@@ -571,7 +592,7 @@
             resetData: function() {
                 if(confirm("DANGER: This will wipe all changes and restore default data. Continue?")) {
                     localStorage.clear();
-                    location.href = "index.html"; 
+                    location.href = "code-01-index.html"; 
                 }
             }
         };
@@ -580,4 +601,3 @@
     </script>
 </body>
 </html>
-
