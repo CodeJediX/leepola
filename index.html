@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeePola | Premium Furniture Marketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
+    
+    <style>
+        /* --- 1. CSS VARIABLES & THEME --- */
+        :root {
+            --primary-dark: #2D1B15;  
+            --primary-wood: #5D4037;  
+            --accent-gold: #C5A059;   
+            --accent-green: #2E7D32;  
+            --accent-red: #D32F2F;    
+            --bg-cream: #FAF9F6;      
+            --bg-white: #FFFFFF;
+            --bg-header: rgba(255, 255, 255, 0.85);
+            --bg-glass: rgba(255, 255, 255, 0.95);
+            --bg-input: #f4f4f4;
+            --border-color: #e0e0e0;
+            --text-main: #2D1B15;
+            --text-light: #795548;
+            --text-heading: #2D1B15;
+            --shadow-card: 0 15px 35px rgba(45, 27, 21, 0.08);
+            --shadow-hover: 0 25px 50px rgba(45, 27, 21, 0.15);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-round: 50px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body.dark-mode {
+            --primary-dark: #e0e0e0;
+            --primary-wood: #bcaaa4;
+            --bg-cream: #121212;
+            --bg-white: #1e1e1e;
+            --bg-header: rgba(18, 18, 18, 0.85);
+            --bg-glass: rgba(30, 30, 30, 0.95);
+            --bg-input: #2d2d2d;
+            --border-color: #333;
+            --text-main: #e0e0e0;
+            --text-light: #b0b0b0;
+            --text-heading: #C5A059;
+            --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hide Default Cursor */ }
+        html { scroll-behavior: smooth; }
+        body { 
+            background-color: var(--bg-cream); color: var(--text-main); 
+            font-family: 'Montserrat', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; 
+            line-height: 1.7; overflow-x: hidden; transition: background-color 0.5s ease, color 0.5s ease; 
+        }
+
+        /* CUSTOM CURSOR STYLES */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed; top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background-color: var(--primary-wood);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px;
+            border: 1px solid var(--accent-gold);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        /* Hover State for Cursor */
+        body.hovering .cursor-outline {
+            width: 60px; height: 60px;
+            background-color: rgba(197, 160, 89, 0.1);
+            border-color: var(--primary-wood);
+        }
+        body.dark-mode .cursor-dot { background-color: var(--accent-gold); }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-cream); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-wood); }
+
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--text-heading); transition: color 0.5s ease; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 25px; }
+        .center-text { text-align: center; }
+
+        /* PRELOADER */
+        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-cream); z-index: 9998; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s; }
+        .loader-content { position: relative; }
+        .loader-text { font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 800; color: transparent; -webkit-text-stroke: 1px var(--primary-wood); position: relative; }
+        .loader-text::before { content: 'LeePola'; position: absolute; top: 0; left: 0; width: 0; height: 100%; color: var(--accent-gold); overflow: hidden; border-right: 2px solid var(--accent-gold); animation: fillText 2s ease-in-out infinite alternate; -webkit-text-stroke: 0px; }
+        @keyframes fillText { 0% { width: 0; } 100% { width: 100%; } }
+
+        /* NAVIGATION */
+        header { background-color: var(--bg-header); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 15px 0; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); transition: var(--transition); }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 800; color: var(--text-heading); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--accent-gold); }
+        
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-item { color: var(--text-main); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; position: relative; padding: 5px 0; }
+        .nav-item::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--accent-gold); transition: width 0.3s ease; }
+        .nav-item:hover::after, .nav-item.active::after { width: 100%; }
+        .nav-item.active { color: var(--accent-gold); }
+        
+        .icon-btn { position: relative; font-size: 1.2rem; color: var(--text-main); transition: var(--transition); padding: 5px; }
+        .icon-btn:hover { color: var(--accent-gold); transform: translateY(-2px); }
+        .badge { position: absolute; top: -5px; right: -8px; background: var(--accent-red); color: white; font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        /* LANGUAGE SELECTOR */
+        .custom-lang-dropdown { position: relative; z-index: 1001; }
+        .selected-lang { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid var(--border-color); border-radius: 50px; background: var(--bg-input); transition: var(--transition); font-size: 0.85rem; font-weight: 600; }
+        .selected-lang:hover { border-color: var(--accent-gold); background: var(--bg-white); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .lang-options { position: absolute; top: 120%; right: 0; min-width: 150px; background: var(--bg-glass); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: var(--shadow-hover); border: 1px solid var(--border-color); list-style: none; padding: 5px; opacity: 0; transform: translateY(-10px) scale(0.95); pointer-events: none; transition: var(--transition); }
+        .custom-lang-dropdown.active .lang-options { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .lang-option { padding: 10px 15px; border-radius: 10px; display: flex; gap: 10px; align-items: center; transition: 0.2s; font-size: 0.9rem; }
+        .lang-option:hover { background: rgba(197, 160, 89, 0.15); color: var(--accent-gold); }
+
+        /* SLIDESHOW */
+        .slideshow-wrapper { position: relative; width: 100%; height: 600px; overflow: hidden; margin-bottom: 80px; border-radius: 0 0 var(--radius-lg) var(--radius-lg); box-shadow: var(--shadow-card); }
+        .slide { display: none; height: 100%; width: 100%; position: absolute; top:0; left:0; background-size: cover; background-position: center; }
+        .slide.active { display: block; animation: zoomEffect 8s infinite alternate; }
+        @keyframes zoomEffect { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .slide-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%); display: flex; flex-direction: column; justify-content: center; padding-left: 10%; color: white; }
+        .slide-content { max-width: 600px; animation: slideUp 0.8s ease-out; }
+        .slide-content h2 { font-size: 4rem; color: var(--accent-gold); margin-bottom: 10px; line-height: 1.1; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .slide-content p { font-size: 1.2rem; font-weight: 300; margin-bottom: 30px; color: rgba(255,255,255,0.9); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* BUTTONS */
+        .btn { padding: 14px 32px; border: none; border-radius: var(--radius-round); font-weight: 700; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: var(--accent-gold); color: #2D1B15; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3); }
+        .btn-primary:hover { background: #fff; color: #2D1B15; transform: translateY(-3px); }
+        .btn-accent { background: #25D366; color: white; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25); }
+        .btn-accent:hover { background: #1ebc57; transform: translateY(-3px); color: white; }
+        .btn-outline { border: 2px solid var(--border-color); background: transparent; color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(197, 160, 89, 0.05); }
+
+        /* FILTERS */
+        .filter-container { background: var(--bg-white); padding: 35px; border-radius: var(--radius-lg); margin-bottom: 50px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; border: 1px solid var(--border-color); align-items: end; }
+        .filter-group { display: flex; flex-direction: column; gap: 10px; }
+        .filter-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); letter-spacing: 0.8px; text-transform: uppercase; }
+        .filter-input { padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; outline: none; font-family: inherit; width: 100%; transition: var(--transition); font-size: 0.9rem; background: var(--bg-input); color: var(--text-main); }
+        .filter-input:focus { border-color: var(--accent-gold); background: var(--bg-white); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
+        .price-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .price-chip { font-size: 0.75rem; padding: 6px 14px; background: var(--bg-input); border-radius: 20px; border: 1px solid var(--border-color); transition: var(--transition); color: var(--text-light); font-weight: 600; }
+        .price-chip:hover { background: var(--accent-gold); color: #2D1B15; border-color: var(--accent-gold); transform: translateY(-2px); }
+
+        /* CARDS & GRID */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding-bottom: 60px; }
+        .item-card { background: var(--bg-white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); transition: var(--transition); position: relative; border: 1px solid transparent; }
+        .item-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: var(--accent-gold); }
+        .item-img-wrap { width: 100%; height: 300px; overflow: hidden; position: relative; }
+        .item-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .item-card:hover .item-img { transform: scale(1.1); }
+        .card-badge { position: absolute; top: 15px; left: 15px; padding: 6px 14px; background: rgba(45, 27, 21, 0.9); backdrop-filter: blur(5px); color: var(--accent-gold); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; border-radius: 30px; z-index: 5; }
+        .card-heart { position: absolute; top: 15px; right: 15px; z-index: 5; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; transition: var(--transition); box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 1.2rem; }
+        .card-heart:hover { transform: scale(1.15); background: white; color: var(--accent-red); }
+        .heart-active { color: var(--accent-red); animation: pop 0.4s ease; }
+        .heart-inactive { color: #ccc; }
+        .item-content { padding: 25px; }
+        .item-shop { font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .item-name { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; font-family: 'Playfair Display', serif; }
+        .item-price { font-size: 1.4rem; color: var(--primary-wood); font-weight: 700; margin-bottom: 20px; }
+        .item-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 15px; }
+
+        /* SHOP CARD */
+        .shop-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; transition: var(--transition); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
+        .shop-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: var(--accent-gold); }
+        .shop-logo { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 20px; object-fit: cover; border: 4px solid var(--bg-cream); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* CART DRAWER */
+        .cart-drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1002; opacity: 0; pointer-events: none; transition: 0.4s; backdrop-filter: blur(3px); }
+        .cart-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        .cart-drawer { position: fixed; top: 0; right: -450px; width: 400px; max-width: 90%; height: 100%; background: var(--bg-white); z-index: 1003; box-shadow: -10px 0 40px rgba(0,0,0,0.2); transition: 0.5s cubic-bezier(0.25, 1, 0.5, 1); display: flex; flex-direction: column; }
+        .cart-drawer.open { right: 0; }
+        .drawer-header { padding: 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-header); }
+        .drawer-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; }
+        .close-drawer { font-size: 1.5rem; transition: 0.3s; }
+        .close-drawer:hover { color: var(--accent-red); transform: rotate(90deg); }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 25px; }
+        .cart-empty-state { text-align: center; margin-top: 50%; transform: translateY(-50%); color: var(--text-light); }
+        .drawer-item { display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); animation: fadeIn 0.4s; }
+        .drawer-item img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+        .modal.show { opacity: 1; }
+        .modal-content { background-color: var(--bg-white); border-radius: var(--radius-lg); width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 50px 100px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal.show .modal-content { transform: scale(1); }
+        .modal-body { display: flex; gap: 40px; padding: 50px; }
+        .modal-img { flex: 1; width: 100%; height: 500px; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-card); }
+        .modal-details { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .opt-group { margin-bottom: 25px; }
+        .opt-title { display: block; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px; color: var(--text-light); }
+        .opt-btn { border: 1px solid var(--border-color); background: transparent; padding: 10px 20px; margin-right: 10px; margin-bottom: 10px; border-radius: 8px; transition: var(--transition); font-weight: 500; color: var(--text-main); }
+        .opt-btn:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
+        .opt-btn.selected { background: var(--accent-gold); color: #2D1B15; border-color: var(--accent-gold); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; color: var(--text-light); z-index: 10; transition: 0.3s; }
+        .close-modal:hover { color: var(--accent-red); transform: rotate(90deg); }
+
+        /* TOAST */
+        #toast { visibility: hidden; min-width: 300px; background-color: var(--bg-white); color: var(--text-main); text-align: center; border-radius: 50px; padding: 16px 24px; position: fixed; z-index: 3000; top: 30px; right: 30px; font-weight: 600; border-left: 5px solid var(--accent-gold); box-shadow: 0 15px 40px rgba(0,0,0,0.2); opacity: 0; transform: translateX(50px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(0); }
+
+        /* SCROLL TOP */
+        #scroll-top { position: fixed; bottom: 30px; right: 30px; background: var(--primary-wood); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; box-shadow: 0 10px 20px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: 0.4s; z-index: 990; }
+        #scroll-top.show { opacity: 1; transform: translateY(0); }
+        #scroll-top:hover { background: var(--accent-gold); transform: translateY(-5px); }
+
+        /* FOOTER */
+        footer { background-color: #111; color: #888; text-align: center; padding: 80px 20px 40px; margin-top: 0; border-top: 4px solid var(--accent-gold); }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #fff; margin-bottom: 15px; display: inline-block;}
+        .footer-heart { color: #D32F2F; animation: beat 1.5s infinite; display: inline-block; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .dev-link { color: var(--accent-gold); font-weight: 600; transition: 0.3s; position: relative; }
+        .dev-link:hover { color: white; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
+
+        @media (max-width: 768px) {
+            .nav-flex { flex-direction: column; gap: 15px; }
+            .nav-links { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .slide-content h2 { font-size: 2.5rem; }
+            .modal-body { flex-direction: column; padding: 25px; }
+            .modal-img { height: 300px; }
+            .filter-container { grid-template-columns: 1fr; }
+            .cart-drawer { width: 100%; right: -100%; }
+            #toast { width: 90%; left: 50%; top: 20px; right: auto; transform: translateX(-50%); }
+            #toast.show { transform: translateX(-50%) translateY(10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-text">LeePola</div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container nav-flex">
+            <a href="javascript:void(0)" class="logo" onclick="app.renderHome()">Lee<span>Pola</span></a>
+            <div class="nav-links">
+                <div id="nav-home" class="nav-item active" onclick="app.renderHome()">Home</div>
+                <div class="nav-item" onclick="app.scrollToSection('section-shops')" id="nav-shops">Shops</div>
+                <div class="nav-item" onclick="app.scrollToSection('section-collection')" id="nav-collection">Collection</div>
+                
+                <div class="icon-btn" onclick="app.renderWishlist()" title="Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                    <span id="wish-count" class="badge">0</span>
+                </div>
+                
+                <div class="icon-btn" onclick="app.toggleCart()" title="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count" class="badge">0</span>
+                </div>
+                
+                <div class="custom-lang-dropdown" id="lang-dropdown">
+                    <div class="selected-lang" onclick="app.toggleLangMenu(event)">
+                        <span id="current-lang-flag">🇺🇸</span>
+                        <span id="current-lang-text">English</span>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </div>
+                    <ul class="lang-options">
+                        <li class="lang-option" onclick="app.setLanguage('en')"><span class="flag">🇺🇸</span> English</li>
+                        <li class="lang-option" onclick="app.setLanguage('si')"><span class="flag">🇱🇰</span> සිංහල</li>
+                        <li class="lang-option" onclick="app.setLanguage('ta')"><span class="flag">🇱🇰</span> தமிழ்</li>
+                    </ul>
+                </div>
+
+                <div class="theme-toggle" onclick="app.toggleTheme()" title="Toggle Dark Mode">
+                    <span id="theme-icon">🌙</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="main-content" class="animate-view"></div>
+
+    <div class="cart-drawer-overlay" onclick="app.toggleCart()"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawer-title">Your Cart</div>
+            <div class="close-drawer" onclick="app.toggleCart()">×</div>
+        </div>
+        <div class="drawer-body" id="drawer-body">
+            </div>
+    </div>
+
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="app.closeModal()">×</span>
+            <div id="modal-body" class="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fa-solid fa-circle-check" style="color:var(--accent-green)"></i> <span id="toast-msg">Item added!</span></div>
+
+    <div id="scroll-top" onclick="window.scrollTo(0,0)"><i class="fa-solid fa-arrow-up"></i></div>
+
+    <footer>
+        <div class="container">
+            <span class="footer-logo">LeePola</span>
+            <p style="margin-bottom:30px; font-size:0.9rem;" id="footer-text">Connecting Sri Lanka's finest wood artisans with you.</p>
+            
+            <a href="admin.html" class="btn-outline" style="font-size:0.7rem; padding: 6px 15px; border-radius: 30px; margin-bottom: 20px; display:inline-block; border-color: #333; color: #666;">
+                <i class="fa-solid fa-gear"></i> Admin Panel
+            </a>
+
+            <div style="border-top: 1px solid #333; padding-top:20px; font-size:0.85rem;">
+                Developed with <span class="footer-heart">❤️</span> by 
+                <a href="https://wa.me/94724401111" target="_blank" class="dev-link">PAMINDU KARUNADASA</a> 
+                <br>
+                © 2025. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+    const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+
+        // --- CUSTOM CURSOR ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        window.addEventListener("mousemove", (e) => {
+            const posX = e.clientX; const posY = e.clientY;
+            cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`;
+            cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
+        });
+        document.querySelectorAll('a, button, .shop-card, .item-card, .lang-option, .icon-btn, .selected-lang, .theme-toggle, .close-drawer, .close-modal, .card-heart').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // --- PRELOADER & SCROLL ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').style.opacity = '0';
+                setTimeout(() => document.getElementById('preloader').style.visibility = 'hidden', 800);
+            }, 1200);
+        });
+
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scroll-top');
+            if(window.scrollY > 300) btn.classList.add('show');
+            else btn.classList.remove('show');
+        });
+
+        // --- TRANSLATION DATA ---
+        const dictionary = {
+            en: {
+                nav_home: "Home", nav_shops: "Shops", nav_coll: "Collection", nav_wish: "Wishlist", nav_cart: "Cart",
+                hero_btn: "View Collection", sec_shops: "Verified Shops", sec_coll: "Explore Collection",
+                chat_btn: "WhatsApp", view_btn: "View", search_ph: "Search furniture...", cat_all: "All Categories", loc_all: "All Locations",
+                price_min: "Min Price (Rs)", price_max: "Max Price (Rs)",
+                cart_empty: "Your Cart is Empty", wish_empty: "Your Wishlist is Empty",
+                start_shop: "Start Shopping", explore_btn: "Explore Items",
+                size: "Size", color: "Finish", wood: "Wood", add_cart: "Add to Cart", sold_by: "Sold by",
+                order_for: "Order for", total: "Total", send_order: "Checkout on WhatsApp",
+                toast_add: "Item added to cart!", toast_rem: "Removed from Wishlist", toast_wish: "Added to Wishlist",
+                footer_txt: "Connecting Sri Lanka's finest wood artisans with you.",
+                cat_table: "Table", cat_chair: "Chair", cat_bed: "Bed", cat_storage: "Storage",
+                cart_title: "Your Cart"
+            },
+            si: {
+                nav_home: "මුල් පිටුව", nav_shops: "වෙළඳසැල්", nav_coll: "එකතුව", nav_wish: "පැතුම්", nav_cart: "කූඩය",
+                hero_btn: "භාණ්ඩ එකතුව", sec_shops: "තහවුරු කළ වෙළඳසැල්", sec_coll: "නව භාණ්ඩ ගවේෂණය",
+                chat_btn: "WhatsApp", view_btn: "බලන්න", search_ph: "භාණ්ඩ සොයන්න...", cat_all: "සියලු වර්ග", loc_all: "සියලු ස්ථාන",
+                price_min: "අවම (රු)", price_max: "උපරිම (රු)",
+                cart_empty: "කූඩය හිස්ය", wish_empty: "පැතුම් ලැයිස්තුව හිස්ය",
+                start_shop: "මිලදී ගැනීම්", explore_btn: "ගවේෂණය",
+                size: "ප්‍රමාණය", color: "වර්ණය", wood: "දැව", add_cart: "කූඩයට එක් කරන්න", sold_by: "විකුණන්නේ",
+                order_for: "ඇණවුම", total: "එකතුව", send_order: "WhatsApp හරහා ඇණවුම් කරන්න",
+                toast_add: "කූඩයට එක් කරන ලදී!", toast_rem: "ඉවත් කරන ලදී", toast_wish: "එක් කරන ලදී",
+                footer_txt: "ශ්‍රී ලංකාවේ හොඳම දැව නිර්මාණ ඔබ වෙත.",
+                cat_table: "මේස", cat_chair: "පුටු", cat_bed: "ඇඳන්", cat_storage: "කබඩ්/රාක්ක",
+                cart_title: "ඔබගේ කූඩය"
+            },
+            ta: {
+                nav_home: "முகப்பு", nav_shops: "கடைகள்", nav_coll: "தொகுப்பு", nav_wish: "விருப்பம்", nav_cart: "வண்டி",
+                hero_btn: "தொகுப்பு", sec_shops: "சரிபார்க்கப்பட்ட கடைகள்", sec_coll: "ஆராயுங்கள்",
+                chat_btn: "WhatsApp", view_btn: "பார்வை", search_ph: "தேடுங்கள்...", cat_all: "அனைத்து", loc_all: "இடங்கள்",
+                price_min: "குறைந்த (ரூ)", price_max: "அதிக (ரூ)",
+                cart_empty: "வண்டி காலியாக உள்ளது", wish_empty: "விருப்பப்பட்டியல் காலியாக உள்ளது",
+                start_shop: "கடைக்குச் செல்லுங்கள்", explore_btn: "ஆராயுங்கள்",
+                size: "அளவு", color: "நிறம்", wood: "மரம்", add_cart: "சேர்", sold_by: "விற்பவர்",
+                order_for: "ஆர்டர்", total: "மொத்தம்", send_order: "WhatsApp ஆர்டர்",
+                toast_add: "சேர்க்கப்பட்டது!", toast_rem: "நீக்கப்பட்டது", toast_wish: "சேர்க்கப்பட்டது",
+                footer_txt: "இலங்கையின் சிறந்த மர கைவினைஞர்கள்.",
+                cat_table: "மேசை", cat_chair: "நாற்காலி", cat_bed: "கட்டில்", cat_storage: "சேமிப்பு",
+                cart_title: "உங்கள் வண்டி"
+            }
+        };
+
+        const flags = { 'en': '🇺🇸', 'si': '🇱🇰', 'ta': '🇱🇰' };
+        const langNames = { 'en': 'English', 'si': 'සිංහල', 'ta': 'தமிழ்' };
+
+        // --- 1. DATASETS & STORAGE ---
+        const defaultShops = [
+            { id: 1, name: "Moratuwa WoodWorks", location: "Moratuwa, Colombo", tel: "94711111111", logo: "https://via.placeholder.com/150/5D4037/FFFFFF?text=MW" },
+            { id: 2, name: "Kandy Antique House", location: "Peradeniya, Kandy", tel: "94722222222", logo: "https://via.placeholder.com/150/8D6E63/FFFFFF?text=KAH" },
+            { id: 3, name: "Ruhunu Furniture", location: "Matara", tel: "94733333333", logo: "https://via.placeholder.com/150/D4AF37/000000?text=RF" },
+            { id: 4, name: "Jaffna Palmeira", location: "Jaffna", tel: "94744444444", logo: "https://via.placeholder.com/150/2E7D32/FFFFFF?text=JP" },
+            { id: 5, name: "Colombo Modern", location: "Bambalapitiya", tel: "94755555555", logo: "https://via.placeholder.com/150/424242/FFFFFF?text=CM" }
+        ];
+
+        const defaultProducts = [
+            { id: 101, shopId: 1, badge:"Best Seller", name: "Royal Teak Dining Table", price: 65000, category: "Table", image: "https://via.placeholder.com/600x400/3E2723/FFFFFF?text=Dining+Table", desc: "Handcrafted from solid teak wood, 6-seater capacity.", sizes: ["4x6 ft", "4x8 ft"], colors: ["Natural Teak", "Dark Walnut"] },
+            { id: 102, shopId: 1, badge:"", name: "Carved Wooden Chair", price: 12500, category: "Chair", image: "https://via.placeholder.com/600x400/5D4037/FFFFFF?text=Wooden+Chair", desc: "Intricate carvings with cushion seat.", sizes: ["Standard"], colors: ["Natural"] },
+            { id: 103, shopId: 2, badge:"Antique", name: "Vintage 1920 Wardrobe", price: 150000, category: "Storage", image: "https://via.placeholder.com/600x400/2D1B15/FFFFFF?text=Antique+Wardrobe", desc: "Restored antique masterpiece.", sizes: ["Large (6ft)"], colors: ["Dark Walnut"] },
+            { id: 104, shopId: 3, badge:"New", name: "Minimalist Study Desk", price: 18500, category: "Table", image: "https://via.placeholder.com/600x400/8D6E63/FFFFFF?text=Study+Desk", desc: "Compact design ideal for students.", sizes: ["4ft Width"], colors: ["Light Oak", "White Ash"] },
+            { id: 105, shopId: 3, badge:"", name: "Mahogany King Bed", price: 95000, category: "Bed", image: "https://via.placeholder.com/600x400/4E342E/FFFFFF?text=King+Bed", desc: "Luxury mahogany bed frame.", sizes: ["King", "Queen"], colors: ["Mahogany Red"] },
+            { id: 106, shopId: 1, badge:"", name: "Coffee Table", price: 14500, category: "Table", image: "https://via.placeholder.com/600x400/795548/FFFFFF?text=Coffee+Table", desc: "Low profile living room centerpiece.", sizes: ["Standard"], colors: ["Natural"] },
+            { id: 107, shopId: 4, badge:"Eco Friendly", name: "Cane Relax Chair", price: 8500, category: "Chair", image: "https://via.placeholder.com/600x400/C8E6C9/000000?text=Cane+Chair", desc: "Traditional Jaffna style cane weaving.", sizes: ["Standard"], colors: ["Natural Cane"] },
+            { id: 108, shopId: 4, badge:"", name: "Veranda Bench", price: 22000, category: "Chair", image: "https://via.placeholder.com/600x400/81C784/000000?text=Bench", desc: "Sturdy wooden bench with cane backrest.", sizes: ["3 Seater"], colors: ["Dark"] },
+            { id: 109, shopId: 5, badge:"Hot", name: "Modern Office Chair", price: 35000, category: "Chair", image: "https://via.placeholder.com/600x400/424242/FFFFFF?text=Office+Chair", desc: "Ergonomic swivel chair.", sizes: ["Adjustable"], colors: ["Black", "Grey"] },
+            { id: 110, shopId: 5, badge:"Modern", name: "Floating TV Unit", price: 45000, category: "Storage", image: "https://via.placeholder.com/600x400/616161/FFFFFF?text=TV+Unit", desc: "Wall mounted modern design.", sizes: ["5ft", "6ft"], colors: ["White Gloss", "Matte Black"] },
+        ];
+
+        let shops = [];
+        let products = [];
+
+        // --- APP LOGIC ---
+        const app = {
+            cart: [],
+            wishlist: [],
+            slideInterval: null,
+            observer: null,
+            isDarkMode: false,
+            lang: 'en',
+
+            init: function() {
+                this.loadDatabase();
+                this.loadUserData();
+                this.initTheme();
+                this.initLanguage();
+                this.updateCounts();
+                this.initScrollObserver();
+                
+                history.replaceState({page: 'home'}, '', '#home');
+                window.onpopstate = (event) => {
+                    if (event.state) this.handleRouting(event.state);
+                    else this.renderHome(false); 
+                };
+                
+                // Close menu/drawer if clicked outside
+                window.onclick = function(event) {
+                    const modal = document.getElementById('item-modal');
+                    const langDrop = document.getElementById('lang-dropdown');
+                    if (event.target == modal) app.closeModal();
+                    if (langDrop && !langDrop.contains(event.target)) langDrop.classList.remove('active');
+                }
+
+                this.renderHome(false); 
+            },
+
+            loadDatabase: function() {
+                try {
+                    const storedShops = localStorage.getItem('leepola_shops');
+                    const storedProducts = localStorage.getItem('leepola_products');
+                    if (storedShops) shops = JSON.parse(storedShops);
+                    else { shops = defaultShops; localStorage.setItem('leepola_shops', JSON.stringify(shops)); }
+                    if (storedProducts) products = JSON.parse(storedProducts);
+                    else { products = defaultProducts; localStorage.setItem('leepola_products', JSON.stringify(products)); }
+                } catch(e) {
+                    shops = defaultShops; products = defaultProducts;
+                }
+            },
+
+            // --- THEME & LANGUAGE ---
+            initTheme: function() {
+                const savedTheme = localStorage.getItem('leepola_theme');
+                if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) this.setTheme(true);
+                else this.setTheme(false);
+            },
+            toggleTheme: function() { this.setTheme(!this.isDarkMode); },
+            setTheme: function(isDark) {
+                this.isDarkMode = isDark;
+                const icon = document.getElementById('theme-icon');
+                if (isDark) { document.body.classList.add('dark-mode'); icon.innerText = '☀️'; localStorage.setItem('leepola_theme', 'dark'); }
+                else { document.body.classList.remove('dark-mode'); icon.innerText = '🌙'; localStorage.setItem('leepola_theme', 'light'); }
+            },
+
+            initLanguage: function() {
+                const savedLang = localStorage.getItem('leepola_lang');
+                if(savedLang) this.lang = savedLang;
+                this.updateLangUI();
+            },
+            toggleLangMenu: function(e) { e.stopPropagation(); document.getElementById('lang-dropdown').classList.toggle('active'); },
+            setLanguage: function(l) {
+                this.lang = l;
+                localStorage.setItem('leepola_lang', l);
+                this.updateLangUI();
+                const currentState = history.state || {page: 'home'};
+                this.handleRouting(currentState); // Re-render current page
+                document.getElementById('lang-dropdown').classList.remove('active');
+            },
+            updateLangUI: function() {
+                document.getElementById('current-lang-flag').innerText = flags[this.lang];
+                document.getElementById('current-lang-text').innerText = langNames[this.lang];
+            },
+            t: function(key) { return dictionary[this.lang][key] || key; },
+            tCat: function(cat) {
+                const map = {'Table': dictionary[this.lang]['cat_table'], 'Chair': dictionary[this.lang]['cat_chair'], 'Bed': dictionary[this.lang]['cat_bed'], 'Storage': dictionary[this.lang]['cat_storage']};
+                return map[cat] || cat;
+            },
+            updateStaticTranslations: function() {
+                document.getElementById('nav-home').innerText = this.t('nav_home');
+                document.getElementById('nav-shops').innerText = this.t('nav_shops');
+                document.getElementById('nav-collection').innerText = this.t('nav_coll');
+                document.getElementById('footer-text').innerText = this.t('footer_txt');
+                document.getElementById('drawer-title').innerText = this.t('cart_title');
+            },
+
+            // --- OBSERVER & ROUTING ---
+            initScrollObserver: function() {
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('active'); });
+                }, { threshold: 0.1 });
+            },
+            observeElements: function() {
+                setTimeout(() => document.querySelectorAll('.reveal').forEach(el => this.observer.observe(el)), 100);
+                // Update cursor listeners for new elements
+                document.querySelectorAll('a, button, .shop-card, .item-card, .lang-option, .icon-btn, .selected-lang, .theme-toggle, .close-drawer, .close-modal, .card-heart').forEach(el => {
+                    el.removeEventListener('mouseenter', () => {}); // cleanup old
+                    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+                });
+            },
+            handleRouting: function(state) {
+                this.updateStaticTranslations();
+                if (state.page === 'home') this.renderHome(false);
+                else if (state.page === 'shop') this.renderShopPage(state.id, false);
+                else if (state.page === 'wishlist') this.renderWishlist(false);
+                // Note: Cart is now a drawer, so we don't route to it.
+            },
+            scrollToSection: function(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) section.scrollIntoView({ behavior: 'smooth' });
+                else {
+                    this.renderHome();
+                    setTimeout(() => {
+                        const newSection = document.getElementById(sectionId);
+                        if(newSection) newSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            },
+            updateView: function(html) {
+                const container = document.getElementById('main-content');
+                container.classList.remove('animate-view');
+                void container.offsetWidth; 
+                container.innerHTML = html;
+                container.classList.add('animate-view');
+                window.scrollTo(0, 0);
+                this.observeElements();
+            },
+
+            // --- DATA ---
+            saveUserData: function() {
+                localStorage.setItem('leepola_cart', JSON.stringify(this.cart));
+                localStorage.setItem('leepola_wishlist', JSON.stringify(this.wishlist));
+                this.updateCounts();
+            },
+            loadUserData: function() {
+                const c = localStorage.getItem('leepola_cart');
+                const w = localStorage.getItem('leepola_wishlist');
+                if(c) this.cart = JSON.parse(c);
+                if(w) this.wishlist = JSON.parse(w);
+            },
+
+            // --- RENDERERS ---
+            renderHome: function(updateHistory = true) {
+                if(updateHistory) history.pushState({page: 'home'}, '', '#home');
+                this.setActiveNav('nav-home');
+                const uniqueLocations = [...new Set(shops.map(s => s.location))];
+
+                let slideHtml = '';
+                if(products.length > 0) {
+                    slideHtml = `<div class="slideshow-wrapper">${products.slice(0, 3).map((p, index) => `
+                        <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: url('${p.image}');">
+                            <div class="slide-overlay"><div class="slide-content">
+                                <h2>${p.name}</h2><p>Rs. ${p.price.toLocaleString()}</p>
+                                <button class="btn btn-primary" onclick="app.openItemModal(${p.id})">${this.t('hero_btn')}</button>
+                            </div></div>
+                        </div>`).join('')}</div>`;
+                }
+
+                let shopsHtml = `<div class="container" id="section-shops"><div class="section-title">${this.t('sec_shops')}</div><div class="grid-container">${shops.map(shop => `
+                    <div class="shop-card reveal" onclick="app.renderShopPage(${shop.id})">
+                        <img src="${shop.logo}" class="shop-logo" alt="logo"><h3>${shop.name}</h3><p style="color:var(--text-light); margin-bottom:15px; font-size:0.9rem;">📍 ${shop.location}</p>
+                        <a href="javascript:void(0)" onclick="event.stopPropagation(); app.openWhatsapp(${shop.id})" class="btn btn-accent" style="font-size:0.75rem; padding:8px 16px;"><i class="fa-brands fa-whatsapp"></i> ${this.t('chat_btn')}</a>
+                    </div>`).join('')}</div></div>`;
+
+                let itemsHtml = `<div class="container" id="section-collection" style="margin-top:40px; margin-bottom:60px;"><div class="section-title">${this.t('sec_coll')}</div>
+                    <div class="filter-container reveal">
+                        <div class="filter-group"><label class="filter-label">${this.t('search_ph')}</label><input class="filter-input" type="text" id="search-input" placeholder="${this.t('search_ph')}" onkeyup="app.filterItems()"></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('cat_all')}</label><select class="filter-input" id="cat-select" onchange="app.filterItems()"><option value="all">${this.t('cat_all')}</option><option value="Table">${this.t('cat_table')}</option><option value="Chair">${this.t('cat_chair')}</option><option value="Bed">${this.t('cat_bed')}</option><option value="Storage">${this.t('cat_storage')}</option></select></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('loc_all')}</label><select class="filter-input" id="loc-select" onchange="app.filterItems()"><option value="all">${this.t('loc_all')}</option>${uniqueLocations.map(loc => `<option value="${loc}">${loc}</option>`).join('')}</select></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('price_min')}</label><input class="filter-input" type="number" id="min-price-input" placeholder="Custom" onkeyup="app.filterItems()"></div>
+                        <div class="filter-group"><label class="filter-label">${this.t('price_max')}</label><input class="filter-input" type="number" id="max-price-input" placeholder="Custom" onkeyup="app.filterItems()"></div>
+                    </div><div id="items-grid" class="grid-container">${this.generateProductCards(products)}</div></div>`;
+
+                this.updateView(slideHtml + shopsHtml + itemsHtml);
+                this.startSlideshow();
+            },
+
+            renderShopPage: function(shopId, updateHistory = true) {
+                if(updateHistory) history.pushState({page: 'shop', id: shopId}, '', '#shop-' + shopId);
+                this.setActiveNav('nav-home'); 
+                const shop = shops.find(s => s.id === shopId);
+                const shopProducts = products.filter(p => p.shopId === shopId);
+                const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(shop.location);
+                this.stopSlideshow();
+
+                const html = `<div class="container" style="padding-top:40px;">
+                    <button class="btn btn-outline" onclick="app.renderHome()" style="margin-bottom:20px;">← ${this.t('nav_home')}</button>
+                    <div class="reveal" style="background:var(--bg-white); padding:40px; border-radius:var(--radius-lg); box-shadow:var(--shadow-card); display:flex; flex-wrap:wrap; align-items:center; gap:30px; border-top: 5px solid var(--primary-wood);">
+                        <img src="${shop.logo}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid var(--border-color);">
+                        <div><h1 style="margin-bottom:10px;">${shop.name}</h1><p style="font-size:1.1rem; color:var(--text-light);">📍 ${shop.location}</p>
+                            <div style="margin-top:20px; display:flex; gap:10px;"><a href="javascript:void(0)" onclick="app.openWhatsapp(${shop.id})" class="btn btn-accent"><i class="fa-brands fa-whatsapp"></i> ${this.t('chat_btn')}</a><a href="${mapLink}" target="_blank" class="btn btn-outline"><i class="fa-solid fa-map-location-dot"></i> Map</a></div>
+                        </div>
+                    </div><div class="section-title" style="margin-top:50px;">${this.t('sec_coll')}</div>
+                    <div class="filter-container reveal"><input class="filter-input" type="text" id="shop-search" placeholder="${this.t('search_ph')}" onkeyup="app.filterShopItems(${shopId})"></div>
+                    <div id="shop-items-grid" class="grid-container">${this.generateProductCards(shopProducts)}</div></div>`;
+                this.updateView(html);
+            },
+
+            renderWishlist: function(updateHistory = true) {
+                if(updateHistory) history.pushState({page: 'wishlist'}, '', '#wishlist');
+                this.setActiveNav(null); // Wishlist isn't nav item anymore
+                this.stopSlideshow();
+                const wishItems = products.filter(p => this.wishlist.includes(p.id));
+                let html = '';
+                if(wishItems.length === 0) html = `<div class="container center-text" style="padding:100px 20px;"><h2 style="color:var(--text-light); font-size:2rem; margin-bottom:20px;">${this.t('wish_empty')}</h2><button class="btn btn-primary" onclick="app.renderHome()">${this.t('explore_btn')}</button></div>`;
+                else html = `<div class="container" style="padding-top:40px;"><div class="section-title">${dictionary[this.lang]['nav_wish']} ❤️</div><div class="grid-container">${this.generateProductCards(wishItems)}</div></div>`;
+                this.updateView(html);
+            },
+
+            // --- NEW: CART DRAWER ---
+            toggleCart: function() {
+                const drawer = document.getElementById('cart-drawer');
+                const overlay = document.querySelector('.cart-drawer-overlay');
+                drawer.classList.toggle('open');
+                overlay.classList.toggle('open');
+                if(drawer.classList.contains('open')) this.renderCartDrawer();
+            },
+
+            renderCartDrawer: function() {
+                const body = document.getElementById('drawer-body');
+                if(this.cart.length === 0) {
+                    body.innerHTML = `<div class="cart-empty-state"><i class="fa-solid fa-cart-arrow-down" style="font-size:3rem; margin-bottom:15px; opacity:0.3;"></i><h3>${this.t('cart_empty')}</h3></div>`;
+                    return;
+                }
+
+                // Group items by shop
+                const cartByShop = {};
+                this.cart.forEach((item, index) => {
+                    const shop = shops.find(s => s.id === item.shopId);
+                    if(shop) {
+                        if(!cartByShop[shop.id]) cartByShop[shop.id] = { shopDetails: shop, items: [] };
+                        cartByShop[shop.id].items.push({...item, originalIndex: index});
+                    }
+                });
+
+                let html = '';
+                for(const [shopId, data] of Object.entries(cartByShop)) {
+                    let itemsList = data.items.map(i => `
+                        <div class="drawer-item">
+                            <img src="${i.image}">
+                            <div style="flex:1;">
+                                <strong style="color:var(--text-heading); font-size:0.95rem;">${i.name}</strong><br>
+                                <small style="color:var(--text-light);">${i.selectedSize} | ${i.selectedColor}</small><br>
+                                <strong style="color:var(--primary-wood);">Rs. ${i.price.toLocaleString()}</strong>
+                            </div>
+                            <i class="fa-solid fa-trash" style="color:var(--accent-red); cursor:pointer;" onclick="app.removeFromCart(${i.originalIndex})"></i>
+                        </div>`).join('');
+
+                    let total = data.items.reduce((sum, i) => sum + i.price, 0);
+                    
+                    // WhatsApp Message Logic
+                    let message = (this.lang === 'si') ? `*නව ඇණවුම*\nආයතනය: ${data.shopDetails.name}\n\n` : (this.lang === 'ta' ? `*புதிய ஆர்டர்*\nகடை: ${data.shopDetails.name}\n\n` : `*New Order Request*\nShop: ${data.shopDetails.name}\n\n`);
+                    data.items.forEach((item, idx) => { message += `${idx + 1}. ${item.name} (${item.selectedSize}, ${item.selectedColor}) - Rs. ${item.price.toLocaleString()}\n`; });
+                    message += (this.lang === 'si') ? `\n*මුළු මුදල: Rs. ${total.toLocaleString()}*` : `\n*Total: Rs. ${total.toLocaleString()}*`;
+
+                    let cleanNum = data.shopDetails.tel.replace(/\D/g, ''); 
+                    if (cleanNum.startsWith('0') && cleanNum.length === 10) cleanNum = '94' + cleanNum.substring(1);
+                    else if (cleanNum.length === 9) cleanNum = '94' + cleanNum;
+                    
+                    let whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanNum}&text=${encodeURIComponent(message)}`;
+
+                    html += `<div style="background:var(--bg-input); padding:15px; border-radius:10px; margin-bottom:20px;">
+                        <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-light);">${this.t('order_for')}: ${data.shopDetails.name}</h4>
+                        ${itemsList}
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding-top:10px; border-top:1px solid var(--border-color);">
+                            <strong>Rs. ${total.toLocaleString()}</strong>
+                            <a href="${whatsappUrl}" target="_blank" class="btn btn-accent" style="padding:8px 15px; font-size:0.75rem;"><i class="fa-brands fa-whatsapp"></i> Checkout</a>
+                        </div>
+                    </div>`;
+                }
+                body.innerHTML = html;
+            },
+
+            // --- HELPERS ---
+            generateProductCards: function(list) {
+                if(list.length === 0) return `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-light);">No items found.</div>`;
+                const shopMap = {}; shops.forEach(s => shopMap[s.id] = s);
+                return list.map(p => {
+                    const isLiked = this.wishlist.includes(p.id);
+                    const sName = shopMap[p.shopId] ? shopMap[p.shopId].name : 'Unknown';
+                    const sLoc = shopMap[p.shopId] ? shopMap[p.shopId].location : 'Unknown';
+                    return `<div class="item-card reveal">
+                        ${p.badge ? `<div class="card-badge">${p.badge}</div>` : ''}
+                        <div class="card-heart" onclick="event.stopPropagation(); app.toggleWishlist(${p.id})"><i class="fa-solid fa-heart ${isLiked ? 'heart-active' : 'heart-inactive'}"></i></div>
+                        <div class="item-img-wrap"><img src="${p.image}" class="item-img" onclick="app.openItemModal(${p.id})" alt="${p.name}"></div>
+                        <div class="item-content"><div class="item-shop">🏪 ${sName}</div><div class="item-name">${p.name}</div><div class="item-price">Rs. ${p.price.toLocaleString()}</div>
+                        <div class="item-actions"><small style="color:var(--text-light);">📍 ${sLoc}</small><button class="btn btn-outline" style="font-size:0.75rem; padding:8px 15px;" onclick="app.openItemModal(${p.id})"><i class="fa-regular fa-eye"></i></button></div></div>
+                    </div>`}).join('');
+            },
+
+            openWhatsapp: function(shopId) {
+                const shop = shops.find(s => s.id === shopId);
+                if(shop) {
+                    let cleanNum = shop.tel.replace(/\D/g, ''); 
+                    if (cleanNum.startsWith('0') && cleanNum.length === 10) cleanNum = '94' + cleanNum.substring(1);
+                    window.open(`https://api.whatsapp.com/send?phone=${cleanNum}`, '_blank');
+                }
+            },
+            toggleWishlist: function(id) {
+                if(this.wishlist.includes(id)) { this.wishlist = this.wishlist.filter(item => item !== id); this.showToast(this.t('toast_rem')); } 
+                else { this.wishlist.push(id); this.showToast(this.t('toast_wish')); }
+                this.saveUserData();
+                if(document.querySelector('.section-title')?.innerText.includes('Wishlist')) this.renderWishlist();
+                else this.refreshCurrentGrid();
+            },
+            refreshCurrentGrid: function() {
+                if(document.getElementById('search-input')) this.filterItems();
+                if(document.getElementById('shop-search')) {
+                    const shopId = products.find(p => document.querySelector('.section-title').innerText.includes(shops.find(s=>s.id === p.shopId).name))?.shopId;
+                    if(shopId) this.filterShopItems(shopId);
+                }
+            },
+            addToCart: function(itemId) {
+                const p = products.find(i => i.id === itemId);
+                const modal = document.getElementById('item-modal');
+                const itemToAdd = { ...p, selectedSize: modal.dataset.tempSize, selectedColor: modal.dataset.tempColor };
+                this.cart.push(itemToAdd);
+                this.saveUserData();
+                this.closeModal();
+                this.toggleCart(); // Open cart to show item added
+                this.showToast(this.t('toast_add'));
+            },
+            removeFromCart: function(originalIndex) {
+                this.cart.splice(originalIndex, 1);
+                this.saveUserData();
+                this.renderCartDrawer();
+            },
+            updateCounts: function() {
+                document.getElementById('cart-count').innerText = this.cart.length;
+                document.getElementById('wish-count').innerText = this.wishlist.length;
+            },
+            openItemModal: function(itemId) {
+                const p = products.find(i => i.id === itemId);
+                const shop = shops.find(s => s.id === p.shopId);
+                const modal = document.getElementById('item-modal');
+                const sizes = p.sizes || ["Standard"];
+                const colors = p.colors || ["Default"];
+                let selSize = sizes[0]; let selColor = colors[0];
+                modal.querySelector('.modal-body').innerHTML = `
+                    <img src="${p.image}" class="modal-img">
+                    <div class="modal-details"><h2 style="font-size:2rem; margin-bottom:5px; color:var(--text-heading);">${p.name}</h2><h3 style="color:var(--primary-wood); font-size:1.8rem; margin-bottom:20px;">Rs. ${p.price.toLocaleString()}</h3>
+                        <p style="margin-bottom:20px; line-height:1.7; color:var(--text-light);">${p.desc}</p>
+                        <p style="margin-bottom:10px; color:var(--text-main);"><strong>${this.t('wood')}:</strong> ${p.woodType || 'Wood'}</p>
+                        <div class="opt-group"><span class="opt-title">${this.t('size')}</span>${sizes.map(s => `<button class="opt-btn ${s===selSize?'selected':''}" onclick="app.selectOption(this, 'size', '${s}')">${s}</button>`).join('')}</div>
+                        <div class="opt-group"><span class="opt-title">${this.t('color')}</span>${colors.map(c => `<button class="opt-btn ${c===selColor?'selected':''}" onclick="app.selectOption(this, 'color', '${c}')">${c}</button>`).join('')}</div>
+                        <button class="btn btn-primary" style="width:100%; padding:15px; margin-top:10px;" onclick="app.addToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i> ${this.t('add_cart')}</button>
+                    </div>`;
+                modal.dataset.tempSize = selSize; modal.dataset.tempColor = selColor;
+                modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10); document.body.style.overflow = 'hidden';
+            },
+            selectOption: function(btn, type, value) {
+                const parent = btn.parentElement;
+                Array.from(parent.children).forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                const modal = document.getElementById('item-modal');
+                if(type === 'size') modal.dataset.tempSize = value;
+                if(type === 'color') modal.dataset.tempColor = value;
+            },
+            closeModal: function() {
+                const modal = document.getElementById('item-modal');
+                modal.classList.remove('show');
+                setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }, 300);
+            },
+            showToast: function(msg) {
+                const toast = document.getElementById("toast");
+                document.getElementById('toast-msg').innerText = msg;
+                toast.className = "show";
+                setTimeout(() => toast.className = toast.className.replace("show", ""), 3000);
+            },
+            setPrice: function(type, val, context, shopId = null) {
+                const prefix = context === 'shop' ? 'shop-' : '';
+                const id = context === 'main' ? (type === 'min' ? 'min-price-input' : 'max-price-input') : (type === 'min' ? prefix + 'min-price' : prefix + 'max-price');
+                const el = document.getElementById(id);
+                if(el) { el.value = val; (context === 'shop' && shopId) ? this.filterShopItems(shopId) : this.filterItems(); }
+            },
+            filterItems: function() {
+                const txt = document.getElementById('search-input').value.toLowerCase();
+                const cat = document.getElementById('cat-select').value;
+                const loc = document.getElementById('loc-select').value;
+                const min = document.getElementById('min-price-input').value; 
+                const max = document.getElementById('max-price-input').value; 
+                const filtered = products.filter(p => {
+                    const shop = shops.find(s => s.id === p.shopId); if (!shop) return false;
+                    return p.name.toLowerCase().includes(txt) && (cat === 'all' || p.category === cat) && (loc === 'all' || shop.location === loc) && (min === "" || p.price >= parseInt(min)) && (max === "" || p.price <= parseInt(max));
+                });
+                document.getElementById('items-grid').innerHTML = this.generateProductCards(filtered);
+                this.observeElements();
+            },
+            filterShopItems: function(shopId) {
+                const txt = document.getElementById('shop-search').value.toLowerCase();
+                const filtered = products.filter(p => p.shopId === shopId && p.name.toLowerCase().includes(txt));
+                document.getElementById('shop-items-grid').innerHTML = this.generateProductCards(filtered);
+                this.observeElements();
+            },
+            setActiveNav: function(id) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const el = document.getElementById(id); if(el) el.classList.add('active');
+            },
+            startSlideshow: function() {
+                this.stopSlideshow();
+                let slideIndex = 0;
+                const slides = document.getElementsByClassName("slide");
+                if(slides.length === 0) return;
+                const showSlides = () => {
+                    for (let i = 0; i < slides.length; i++) slides[i].classList.remove("active"); 
+                    slideIndex++; if (slideIndex > slides.length) slideIndex = 1;
+                    slides[slideIndex-1].classList.add("active");  
+                }
+                this.slideInterval = setInterval(showSlides, 4000); 
+            },
+            stopSlideshow: function() { if(this.slideInterval) clearInterval(this.slideInterval); }
+        };
+
+        app.init();
+    </script>
+</body>
+</html>
